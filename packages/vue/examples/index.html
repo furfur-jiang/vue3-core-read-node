@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>http://localhost:5000/packages/vue/examples/ 此路径下可以调试</h1>
+    <script src="../dist/vue.global.js"></script>
+    <script>
+      console.log('ok')
+      const Counter = {
+        data() {
+          return {
+            counter: 0
+          }
+        }
+      }
+
+      Vue.createApp(Counter).mount('#counter')
+    </script>
+  </body>
+</html>

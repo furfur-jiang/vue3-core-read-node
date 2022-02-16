@@ -1,3 +1,25 @@
+# Vue3工具源码阅读
+
+
+vue3 shared 工具函数，多个包之间共享的内部实用工具(特别是运行时和编译器包使用的与环境无关的实用工具)。
+
+阅读文件：
+  ****
+
+附有注释笔记
+
+阅读时参考自：https://juejin.cn/post/6994976281053888519
+
+
+
+
+
+
+
+
+
+
+
 # vuejs/core [![npm](https://img.shields.io/npm/v/vue.svg)](https://www.npmjs.com/package/vue) [![build status](https://github.com/vuejs/core/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vuejs/core/actions/workflows/ci.yml)
 
 ## Getting Started
