@@ -1,39 +1,61 @@
+// 命令行参数解析
 const args = require('minimist')(process.argv.slice(2))
 const fs = require('fs')
 const path = require('path')
+// 终端多色彩输出
 const chalk = require('chalk')
+// 语义化版本
 const semver = require('semver')
 const currentVersion = require('../package.json').version
+// 交互式询问 CLI
 const { prompt } = require('enquirer')
+// 执行终端命令
 const execa = require('execa')
 
+// 对应 yarn run release --preid=beta
+// beta
 const preId =
   args.preid ||
   (semver.prerelease(currentVersion) && semver.prerelease(currentVersion)[0])
+
+// 对应 yarn run release --dry
+// true
 const isDryRun = args.dry
+// 对应 yarn run release --skipTests
+// true 跳过测试
 const skipTests = args.skipTests
+// 对应 yarn run release --skipBuild 
+// true
 const skipBuild = args.skipBuild
+// 读取 packages 文件夹，过滤掉 不是 .ts文件 结尾 并且不是 . 开头的文件夹
 const packages = fs
   .readdirSync(path.resolve(__dirname, '../packages'))
   .filter(p => !p.endsWith('.ts') && !p.startsWith('.'))
-
+// 跳过的包
 const skippedPackages = []
-
+// 版本递增
 const versionIncrements = [
   'patch',
   'minor',
   'major',
   ...(preId ? ['prepatch', 'preminor', 'premajor', 'prerelease'] : [])
 ]
-
+// inc是生成一个版本
 const inc = i => semver.inc(currentVersion, i, preId)
+
+
+// 获取 bin 命令
 const bin = name => path.resolve(__dirname, '../node_modules/.bin/' + name)
 const run = (bin, args, opts = {}) =>
   execa(bin, args, { stdio: 'inherit', ...opts })
 const dryRun = (bin, args, opts = {}) =>
   console.log(chalk.blue(`[dryrun] ${bin} ${args.join(' ')}`), opts)
+
+// 获取包的路径
 const runIfNotDry = isDryRun ? dryRun : run
 const getPkgRoot = pkg => path.resolve(__dirname, '../packages/' + pkg)
+
+// 控制台输出
 const step = msg => console.log(chalk.cyan(msg))
 
 async function main() {
@@ -77,19 +99,22 @@ async function main() {
   }
 
   // run tests before release
+  // 在发布之前运行测试
   step('\nRunning tests...')
   if (!skipTests && !isDryRun) {
-    await run(bin('jest'), ['--clearCache'])
+    await run(bin('jest'), ['--clearCache'])   //bin('jest'),相当于在命令终端，项目根目录 运行 ./node_modules/.bin/jest 命令。
     await run('pnpm', ['test', '--', '--bail'])
   } else {
     console.log(`(skipped)`)
   }
 
   // update all package versions and inter-dependencies
+  // 更新所有包版本和相互依赖关系  
   step('\nUpdating cross dependencies...')
   updateVersions(targetVersion)
 
   // build all packages with types
+  // 构建所有带有类型的包
   step('\nBuilding all packages...')
   if (!skipBuild && !isDryRun) {
     await run('pnpm', ['run', 'build', '--', '--release'])
@@ -101,6 +126,7 @@ async function main() {
   }
 
   // generate changelog
+  // 生成的更新日志
   step('\nGenerating changelog...')
   await run(`pnpm`, ['run', 'changelog'])
 
@@ -118,6 +144,7 @@ async function main() {
   }
 
   // publish packages
+  // 发布包
   step('\nPublishing packages...')
   for (const pkg of packages) {
     await publishPackage(pkg, targetVersion, runIfNotDry)

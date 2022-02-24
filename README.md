@@ -2,13 +2,15 @@
 
 
 vue3 shared 工具函数，多个包之间共享的内部实用工具(特别是运行时和编译器包使用的与环境无关的实用工具)。
+vue3 release 发布流程
 
 阅读文件：
   **packages/shared/src/index.ts**
+  **scripts/release.js**
 
 附有注释笔记
 
-阅读时参考自：https://juejin.cn/post/6994976281053888519
+
 
 
 
